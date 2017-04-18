@@ -24,11 +24,14 @@ from sklearn.model_selection import train_test_split
 import json
 from utils import modelrunner
 from networks import funnybotlstm
+from Collections import Counter
 
 def set_config(FBL):
 
     config = {}
     config['num_epochs'] = 50
+    config['shuffle'] = False
+    config['batch_size'] = 1
 
     setattr(FBL, 'config', config)
 
@@ -41,8 +44,20 @@ def run():
 
 
 
-    pdb.set_trace()
-    modelrunner.run(data, CONFIG=FBL.config)
+    return data
+#    modelrunner.run(data, CONFIG=FBL.config)
+
+def GroupDataByLength(X, y):
+
+    N = []
+    for i in X:
+        N.append(len(X))
+
+    counts = Counter(N)
+    # TODO: Set up a grouping in the number of items for batching
+#    for count in counts.keys():
+
+
 
 def parsedata(data):
 
@@ -81,8 +96,9 @@ def load_data():
         data = json.load(f)
         data = parsedata(data)
 
+    pdb.set_trace()
     return data
 
 if __name__=='__main__':
-    run()
+    data = run()
 

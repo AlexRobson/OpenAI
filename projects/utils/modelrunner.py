@@ -1,4 +1,5 @@
 import numpy as np
+import time
 import pdb
 
 
@@ -25,6 +26,11 @@ def run(data=None, functions=None, CONFIG=None):
 	bookkeeping['train_err'] = []
 	bookkeeping['valid_err'] = []
 
+	X_train, y_train = data['train']
+	X_val, y_val = data['valid']
+	X_test, y_test = data['test']
+
+
 	for epoch in range(CONFIG['num_epochs']):
 		# In each epoch, we do a full pass over the training data:
 		epoch_loss = {}
@@ -32,7 +38,7 @@ def run(data=None, functions=None, CONFIG=None):
 		start_time = time.time()
 
 
-		for batch in iterate_minibatches(X_train, y_train, batch_size, shuffle=shuffleset):
+		for batch in iterate_minibatches(X_train, y_train, CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
 			inputs, targets= batch
 			Gseed = lasagne.utils.floatX(np.random.rand(len(inputs), GIN))
 			epoch_loss['gen'] += G_trainfn(Gseed)
