@@ -24,7 +24,7 @@ from sklearn.model_selection import train_test_split
 import json
 from utils import modelrunner
 from networks import funnybotlstm
-from Collections import Counter
+from utils.utils import GroupDataByLength
 
 def set_config(FBL):
 
@@ -42,22 +42,8 @@ def run():
 
     set_config(FBL)
 
-
-
     return data
 #    modelrunner.run(data, CONFIG=FBL.config)
-
-def GroupDataByLength(X, y):
-
-    N = []
-    for i in X:
-        N.append(len(X))
-
-    counts = Counter(N)
-    # TODO: Set up a grouping in the number of items for batching
-#    for count in counts.keys():
-
-
 
 def parsedata(data):
 
@@ -77,10 +63,15 @@ def parsedata(data):
 
     # Percentage training
     pdata = {}
-    pdata['train'] = X_train, y_train
-    pdata['valid'] = X_valid, y_valid
-    pdata['test'] = X_test, y_test
 
+    X_train_dict, y_train_dict = GroupDataByLength(X_train, y_train)
+    X_valid_dict, y_valid_dict = GroupDataByLength(X_valid, y_valid)
+    X_test_dict, y_test_dict = GroupDataByLength(X_test, y_test)
+    pdata['train'] = X_train_dict, y_train_dict
+    pdata['valid'] = X_valid_dict, y_valid_dict
+    pdata['test'] = X_test_dict, y_test_dict
+
+    pdb.set_trace()
     return pdata
 
 
@@ -96,7 +87,6 @@ def load_data():
         data = json.load(f)
         data = parsedata(data)
 
-    pdb.set_trace()
     return data
 
 if __name__=='__main__':

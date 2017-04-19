@@ -33,62 +33,43 @@ def run(data=None, functions=None, CONFIG=None):
 
 	for epoch in range(CONFIG['num_epochs']):
 		# In each epoch, we do a full pass over the training data:
-		epoch_loss = {}
+		loss = 0
 		train_batches = 0
 		start_time = time.time()
 
 
 		for batch in iterate_minibatches(X_train, y_train, CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
 			inputs, targets= batch
-			Gseed = lasagne.utils.floatX(np.random.rand(len(inputs), GIN))
-			epoch_loss['gen'] += G_trainfn(Gseed)
-			epoch_loss['discrim'] += C_trainfn(inputs, Gseed)
+			loss += functions['train'](inputs, targets)
 			train_batches += 1
 
 		# And a full pass over the validation data:
 		val_err = 0
 		val_acc = 0
 		val_batches = 0
-		gen_err = 0
-		gen_acc = 0
-		for batch in iterate_minibatches(X_val, y_val, batch_size, shuffle=shuffleset):
+		for batch in iterate_minibatches(X_val, y_val, CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
 			inputs, targets = batch
-			#            err, acc = val_fn(inputs)
-			Gseed = lasagne.utils.floatX(np.random.rand(len(inputs), GIN))
-			err, acc = val_fn(inputs)
+			err, acc = functions['val_fn'](inputs, targets)
 			val_err += err
 			val_acc += acc
-			err, acc = val_fn_gen(Gseed)
-			gen_err += err
-			gen_acc += acc
 			val_batches += 1
 
-		train_err['gen'].append(epoch_loss['gen'] / train_batches)
-		train_err['discrim'].append(epoch_loss['discrim'] / train_batches)
-		valid_err['discrim'].append(val_err / val_batches)
-		valid_err['gen'].append(gen_err / val_batches)
-		valid_acc['real'].append(val_acc / val_batches * 100)
-		valid_acc['synth'].append(gen_acc / val_batches * 100)
-		G_weights['W1'].append(np.median(G_params[2].get_value()))
-		# Then we print the results for this epoch:
+		bookkeeping['loss'].append(loss)
+		bookkeeping['val_err'].append(val_err)
+
+
 		print("Epoch {} of {} took {:.3f}s".format(
-				epoch + 1, num_epochs, time.time() - start_time))
-		print("  Discriminator[Train] loss:\t\t\t{:.6f}".format(epoch_loss['discrim'] / train_batches))
-		print("  Discriminator[Valid] loss:\t\t\t{:.6f}".format(val_err / val_batches))
-		print("  Generator[Train] loss:\t\t\t{:.6f}".format(epoch_loss['gen'] / train_batches))
-		print("  Discriminator[real] acc:\t\t\t{:.2f} %".format(
-				val_acc / val_batches * 100))
-		print("  Discriminator[synthetic] acc\t\t\t{:.2f} %".format(
-				gen_acc / val_batches * 100))
-		create_image(generate, 6, 7, name='test_e{}.png'.format(epoch), configs=configs)
+				epoch + 1, CONFIG['num_epochs'], time.time() - start_time))
+		print("  Training loss:\t\t\t{:.6f}".format(loss / train_batches))
+		print("  Validation loss:\t\t\t{:.6f}".format(val_err / val_batches))
 
 	# After training, we compute and print the test error:
 	test_err = 0
 	test_acc = 0
 	test_batches = 0
-	for batch in iterate_minibatches(X_test, y_test, batch_size, shuffle=shuffleset):
+	for batch in iterate_minibatches(X_test, y_test, CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
 		inputs, targets = batch
-		err, acc = val_fn(inputs)
+		err, acc = functions['val_fn'](inputs, targets)
 		test_err += err
 		test_acc += acc
 		test_batches += 1
