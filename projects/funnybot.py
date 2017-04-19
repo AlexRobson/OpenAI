@@ -24,7 +24,7 @@ from sklearn.model_selection import train_test_split
 import json
 from utils import modelrunner
 from networks import funnybotlstm
-from utils.utils import GroupDataByLength
+from utils.utils import GroupDataByLength, generate_encoding
 
 def set_config(FBL):
 
@@ -37,13 +37,14 @@ def set_config(FBL):
 
 
 def run():
-    data = load_data()
+    data, coding = load_data()
     FBL = funnybotlstm.funnybotlstm()
-
     set_config(FBL)
+    pdb.set_trace()
+    FBL.initialise()
 
-    return data
-#    modelrunner.run(data, CONFIG=FBL.config)
+    # TODO: Convert modelrunner into a class
+    modelrunner.run(data, functions=FBL.functions, CONFIG=FBL.config)
 
 def parsedata(data):
 
@@ -71,7 +72,6 @@ def parsedata(data):
     pdata['valid'] = X_valid_dict, y_valid_dict
     pdata['test'] = X_test_dict, y_test_dict
 
-    pdb.set_trace()
     return pdata
 
 
@@ -87,8 +87,11 @@ def load_data():
         data = json.load(f)
         data = parsedata(data)
 
-    return data
+    with open(fpath) as f:
+        coding = generate_encoding(f.read())
+
+    return data, coding
 
 if __name__=='__main__':
-    data = run()
+    run()
 

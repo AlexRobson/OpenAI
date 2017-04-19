@@ -38,21 +38,23 @@ def run(data=None, functions=None, CONFIG=None):
 		start_time = time.time()
 
 
-		for batch in iterate_minibatches(X_train, y_train, CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
-			inputs, targets= batch
-			loss += functions['train'](inputs, targets)
-			train_batches += 1
+		for seqlength in X_train.keys():
+			for batch in iterate_minibatches(X_train[seqlength], y_train[seqlength], CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
+				inputs, targets= batch
+				loss += functions['train'](inputs, targets)
+				train_batches += 1
 
 		# And a full pass over the validation data:
 		val_err = 0
 		val_acc = 0
 		val_batches = 0
-		for batch in iterate_minibatches(X_val, y_val, CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
-			inputs, targets = batch
-			err, acc = functions['val_fn'](inputs, targets)
-			val_err += err
-			val_acc += acc
-			val_batches += 1
+		for seqlength in X_val.keys():
+			for batch in iterate_minibatches(X_val[seqlength], y_val[seqlength], CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
+				inputs, targets = batch
+				err, acc = functions['val_fn'](inputs, targets)
+				val_err += err
+				val_acc += acc
+				val_batches += 1
 
 		bookkeeping['loss'].append(loss)
 		bookkeeping['val_err'].append(val_err)

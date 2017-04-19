@@ -2,6 +2,25 @@ from collections import Counter
 import numpy as np
 import pdb
 
+def generate_encoding(text):
+
+    coding = {}
+    pdb.set_trace()
+    chars = list(set(text))
+    coding['decoding'] = { i:ch for i,ch in enumerate(chars) }
+    coding['encoding'] = { ch:i for i,ch in enumerate(chars) }
+
+    return coding
+
+
+def encode_text(text, encoding):
+
+    encoding = []
+    for char in text:
+        encoding.append(encoding[char])
+
+	return char_to_ix
+
 def GroupDataByLength(X, y, type='list'):
 
     N = []
