@@ -24,7 +24,7 @@ from sklearn.model_selection import train_test_split
 import json
 from utils import modelrunner
 from networks import funnybotlstm
-from utils.utils import GroupDataByLength, generate_encoding
+from utils.utils import GroupDataByLength, generate_encoding, encode_text
 
 def set_config(FBL):
 
@@ -38,23 +38,26 @@ def set_config(FBL):
 
 def run():
     data, coding = load_data()
+
+    # Initialise the funnybot class
     FBL = funnybotlstm.funnybotlstm()
     set_config(FBL)
-    pdb.set_trace()
     FBL.initialise()
 
     # TODO: Convert modelrunner into a class
     modelrunner.run(data, functions=FBL.functions, CONFIG=FBL.config)
 
-def parsedata(data):
+def parsedata(data,coding):
 
     textfields = ['body']
     scorefields = ['score']
     titlefield = ['title']
 
-    X = [(d['body'], d['score']) for d in data]
+    X = [(encode_text(d['body'], coding['encoding']), d['score']) for d in data]
 
     X, y = zip(*X)
+
+
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42)
@@ -80,15 +83,16 @@ def load_data():
     import json
 
     froot = '../data/joke-dataset/'
-    files = ['reddit_jokes.json', 'stupidstuff.json', 'wocka.json']
-
+    files = ['test.json', 'reddit_jokes.json', 'stupidstuff.json', 'wocka.json']
     fpath = froot+files[0]
-    with open(fpath) as f:
-        data = json.load(f)
-        data = parsedata(data)
 
     with open(fpath) as f:
         coding = generate_encoding(f.read())
+
+
+    with open(fpath) as f:
+        data = json.loads(f.read().decode('unicode_escape'))
+        data = parsedata(data, coding)
 
     return data, coding
 

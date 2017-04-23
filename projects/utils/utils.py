@@ -5,8 +5,7 @@ import pdb
 def generate_encoding(text):
 
     coding = {}
-    pdb.set_trace()
-    chars = list(set(text))
+    chars = list(set(text.decode('unicode_escape')))
     coding['decoding'] = { i:ch for i,ch in enumerate(chars) }
     coding['encoding'] = { ch:i for i,ch in enumerate(chars) }
 
@@ -15,11 +14,11 @@ def generate_encoding(text):
 
 def encode_text(text, encoding):
 
-    encoding = []
+    encoded_text = []
     for char in text:
-        encoding.append(encoding[char])
+        encoded_text.append(encoding[char])
 
-	return char_to_ix
+	return encoded_text
 
 def GroupDataByLength(X, y, type='list'):
 
