@@ -51,13 +51,13 @@ def run(data=None, functions=None, CONFIG=None):
 		for seqlength in X_val.keys():
 			for batch in iterate_minibatches(X_val[seqlength], y_val[seqlength], CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
 				inputs, targets = batch
-				err, acc = functions['val_fn'](inputs, targets)
+				err = functions['val_fn'](inputs, targets)
 				val_err += err
-				val_acc += acc
+#				val_acc += acc
 				val_batches += 1
 
-		bookkeeping['loss'].append(loss)
-		bookkeeping['val_err'].append(val_err)
+		bookkeeping['train_err'].append(loss)
+		bookkeeping['valid_err'].append(val_err)
 
 
 		print("Epoch {} of {} took {:.3f}s".format(
@@ -69,15 +69,17 @@ def run(data=None, functions=None, CONFIG=None):
 	test_err = 0
 	test_acc = 0
 	test_batches = 0
-	for batch in iterate_minibatches(X_test, y_test, CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
-		inputs, targets = batch
-		err, acc = functions['val_fn'](inputs, targets)
-		test_err += err
-		test_acc += acc
-		test_batches += 1
+	for seqlength in X_test.keys():
+		for batch in iterate_minibatches(X_test[seqlength], y_test[seqlength], CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
+			inputs, targets = batch
+			err = functions['val_fn'](inputs, targets)
+			test_err += err
+	#		test_acc += acc
+			test_batches += 1
+
 	print("Final results:")
 	print("  test loss:\t\t\t{:.6f}".format(test_err / test_batches))
 	print("  test accuracy:\t\t{:.2f} %".format(
 			test_acc / test_batches * 100))
 
-	return train_err, valid_err, valid_acc, G_weights
+	return train_err, valid_err, valid_acc

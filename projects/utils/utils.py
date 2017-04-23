@@ -15,29 +15,29 @@ def generate_encoding(text):
 def encode_text(text, encoding):
 
     encoded_text = []
-    for char in text:
-        encoded_text.append(encoding[char])
+    encoded_text = [encoding[char] for char in text]
 
-	return encoded_text
+    return encoded_text
 
-def GroupDataByLength(X, y, type='list'):
+
+def GroupDataByLength(X, y, itype='list'):
 
     N = []
     for sample in X:
         N.append(len(sample))
 
     N = np.array(N)
-    counts = Counter(N)
+    vals = Counter(N)
     X_dict = {}
     y_dict = {}
 
-    for count in counts:
-        IDX = np.ravel(np.where(N==count))
-        if type is 'list':
-            X_dict[count] = [X[idx] for idx in IDX]
-            y_dict[count] = [y[idx] for idx in IDX]
-        elif type is 'array':
-            raise NotImplementedError
+    for val in vals:
+        IDX = np.ravel(np.where(N==val))
+        if itype is 'list':
+            X_dict[val] = np.array([X[idx] for idx in IDX], dtype='float32')[:, :, None]
+            y_dict[val] = np.array([y[idx] for idx in IDX], dtype='float32')[:, None]
+        elif itype is 'array':
+            raise NotImplementedError("Must always be an array")
 
     return X_dict, y_dict
 

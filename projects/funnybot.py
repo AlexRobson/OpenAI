@@ -58,7 +58,6 @@ def parsedata(data,coding):
     X, y = zip(*X)
 
 
-
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42)
 
@@ -67,7 +66,6 @@ def parsedata(data,coding):
 
     # Percentage training
     pdata = {}
-
     X_train_dict, y_train_dict = GroupDataByLength(X_train, y_train)
     X_valid_dict, y_valid_dict = GroupDataByLength(X_valid, y_valid)
     X_test_dict, y_test_dict = GroupDataByLength(X_test, y_test)
