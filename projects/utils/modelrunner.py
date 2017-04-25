@@ -36,7 +36,7 @@ def run(data=None, functions=None, CONFIG=None):
 		loss = 0
 		train_batches = 0
 		start_time = time.time()
-
+		print("Epoch...{}".format(epoch))
 
 		for seqlength in X_train.keys():
 			for batch in iterate_minibatches(X_train[seqlength], y_train[seqlength], CONFIG['batch_size'], shuffle=CONFIG['shuffle']):

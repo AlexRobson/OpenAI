@@ -15,10 +15,23 @@ def generate_encoding(text):
 def encode_text(text, encoding):
 
     encoded_text = []
-    encoded_text = [encoding[char] for char in text]
+    encoded_text = [encoding[char] for char in text if char in encoding]
+
+    assert len(encoded_text)>0
+
 
     return encoded_text
 
+def byteify(input):
+    if isinstance(input, dict):
+        return {byteify(key): byteify(value)
+                for key, value in input.iteritems()}
+    elif isinstance(input, list):
+        return [byteify(element) for element in input]
+    elif isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input
 
 def GroupDataByLength(X, y, itype='list'):
 

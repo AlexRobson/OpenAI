@@ -24,7 +24,8 @@ from sklearn.model_selection import train_test_split
 import json
 from utils import modelrunner
 from networks import funnybotlstm
-from utils.utils import GroupDataByLength, generate_encoding, encode_text
+import yaml
+from utils.utils import GroupDataByLength, generate_encoding, encode_text, byteify
 
 def set_config(FBL):
 
@@ -53,7 +54,7 @@ def parsedata(data,coding):
     scorefields = ['score']
     titlefield = ['title']
 
-    X = [(encode_text(d['body'], coding['encoding']), d['score']) for d in data]
+    X = [(encode_text(d['title']+d['body'], coding['encoding']), d['score']) for d in data[0:1000]]
 
     X, y = zip(*X)
 
@@ -82,14 +83,20 @@ def load_data():
 
     froot = '../data/joke-dataset/'
     files = ['test.json', 'reddit_jokes.json', 'stupidstuff.json', 'wocka.json']
-    fpath = froot+files[0]
+    fpath = froot+files[1]
 
     with open(fpath) as f:
         coding = generate_encoding(f.read())
 
 
     with open(fpath) as f:
-        data = json.loads(f.read().decode('unicode_escape'))
+#        pdb.set_trace()
+#        data = yaml.safe_load(f.read())
+        data = json.loads(f.read())
+#        pdb.set_trace()
+#        data = json.loads(f.read().decode('unicode_escape'))
+#        data = json.loads(f.read().decode('unicode_escape').encode('cp1252').decode('utf-8'))
+#        data = json.loads(f.read())
         data = parsedata(data, coding)
 
     return data, coding
