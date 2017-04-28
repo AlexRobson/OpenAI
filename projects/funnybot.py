@@ -22,6 +22,7 @@ Useful links: http://karpathy.github.io/2015/05/21/rnn-effectiveness/
 import pdb
 from sklearn.model_selection import train_test_split
 import json
+import numpy as np
 from utils import modelrunner
 from networks import funnybotlstm
 import yaml
@@ -54,9 +55,13 @@ def parsedata(data,coding):
     scorefields = ['score']
     titlefield = ['title']
 
-    X = [(encode_text(d['title']+d['body'], coding['encoding']), d['score']) for d in data[0:1000]]
+    X = [(encode_text(d['title']+d['body'], coding), d['score']) for d in data[0:1000]]
 
     X, y = zip(*X)
+
+    # Normalise the bins
+    _, bins = np.histogram(y)
+    y = np.digitize(y, bins)
 
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -88,7 +93,7 @@ def load_data():
     with open(fpath) as f:
         coding = generate_encoding(f.read())
 
-
+    print("Length of the encoding is {}".format(len(coding['decoding'])))
     with open(fpath) as f:
 #        pdb.set_trace()
 #        data = yaml.safe_load(f.read())

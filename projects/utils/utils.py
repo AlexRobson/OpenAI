@@ -12,9 +12,10 @@ def generate_encoding(text):
     return coding
 
 
-def encode_text(text, encoding):
+def encode_text(text, coding):
 
     encoded_text = []
+    encoding = coding['encoding']
     encoded_text = [encoding[char] for char in text if char in encoding]
 
     assert len(encoded_text)>0
