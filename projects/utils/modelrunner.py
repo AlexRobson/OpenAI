@@ -50,7 +50,7 @@ def run(data=None, functions=None, CONFIG=None):
 		val_batches = 0
 		for seqlength in X_val.keys():
 			for batch in iterate_minibatches(X_val[seqlength], y_val[seqlength], CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
-				inputs, targets = batch
+				inputs, targets = functions['prepare'](batch)
 				err = functions['val_fn'](inputs, targets)
 				val_err += err
 #				val_acc += acc
@@ -71,7 +71,7 @@ def run(data=None, functions=None, CONFIG=None):
 	test_batches = 0
 	for seqlength in X_test.keys():
 		for batch in iterate_minibatches(X_test[seqlength], y_test[seqlength], CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
-			inputs, targets = batch
+			inputs, targets = functions['prepare'](batch)
 			err = functions['val_fn'](inputs, targets)
 			test_err += err
 	#		test_acc += acc

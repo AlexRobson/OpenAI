@@ -24,16 +24,18 @@ from sklearn.model_selection import train_test_split
 import json
 import numpy as np
 from utils import modelrunner
-from networks.funnybotlstm import Scorer
+from networks.funnybotlstm import Scorer, Generator
 import yaml
 from utils.utils import GroupDataByLength, generate_encoding, encode_text, byteify
+
+GENERATOR = True
 
 def set_config(FBL):
 
     config = {}
-    config['num_epochs'] = 50
+    config['num_epochs'] = 5
     config['shuffle'] = False
-    config['batch_size'] = 1
+    config['batch_size'] = 128
 
     setattr(FBL, 'config', config)
 
@@ -42,12 +44,36 @@ def run():
     data, coding = load_data()
 
     # Initialise the funnybot class
-    FBL = Scorer()
+    if GENERATOR:
+        FBL = Scorer()
+    else:
+        FBL = Generator()
     set_config(FBL)
     FBL.initialise()
 
     # TODO: Convert modelrunner into a class
     modelrunner.run(data, functions=FBL.functions, CONFIG=FBL.config)
+
+def create_snippets(sample, sniplength):
+    """
+    This function receives some sample text of arbitrary length, and then snips it
+    into X, y samples of sample[i:i+sniplength], sample[i+sniplength+1], for all i
+    :param sample:
+    :return: dataX, datay
+    """
+    seq_length = len(sample)
+    dataX = []
+    datay = []
+    if seq_length<sniplength:
+        return sample[0:-1], sample[-1]
+    for i in range(0, seq_length-sniplength, 1):
+        seqX = sample[i:i+sniplength]
+        seqy = sample[i+sniplength]
+        dataX.append(seqX)
+        datay.append(seqy)
+
+    return dataX, datay
+
 
 def parsedata(data,coding):
 
@@ -56,12 +82,25 @@ def parsedata(data,coding):
     titlefield = ['title']
 
     X = [(encode_text(d['title']+d['body'], coding), d['score']) for d in data[0:1000]]
-
     X, y = zip(*X)
 
-    # Normalise the bins
-    _, bins = np.histogram(y)
-    y = np.digitize(y, bins)
+    if GENERATOR:
+		X_dash = []
+		y_dash = []
+		for x in X:
+			pX, py = create_snippets(x, 20)
+			X_dash.extend(pX)
+			y_dash.extend(py)
+
+		# Now relabel
+		X = X_dash
+		y = y_dash
+
+    else:
+		# Normalise the bins
+		_, bins = np.histogram(y)
+		y = np.digitize(y, bins)
+
 
 
     X_train, X_test, y_train, y_test = train_test_split(
