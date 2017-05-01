@@ -40,7 +40,7 @@ def run(data=None, functions=None, CONFIG=None):
 
 		for seqlength in X_train.keys():
 			for batch in iterate_minibatches(X_train[seqlength], y_train[seqlength], CONFIG['batch_size'], shuffle=CONFIG['shuffle']):
-				inputs, targets= batch
+				inputs, targets= functions['prepare'](batch)
 				loss += functions['train'](inputs, targets)
 				train_batches += 1
 
