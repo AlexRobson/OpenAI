@@ -24,7 +24,7 @@ from sklearn.model_selection import train_test_split
 import json
 import numpy as np
 from utils import modelrunner
-from networks import funnybotlstm
+from networks.funnybotlstm import Scorer
 import yaml
 from utils.utils import GroupDataByLength, generate_encoding, encode_text, byteify
 
@@ -42,7 +42,7 @@ def run():
     data, coding = load_data()
 
     # Initialise the funnybot class
-    FBL = funnybotlstm.funnybotlstm()
+    FBL = Scorer()
     set_config(FBL)
     FBL.initialise()
 
@@ -95,13 +95,7 @@ def load_data():
 
     print("Length of the encoding is {}".format(len(coding['decoding'])))
     with open(fpath) as f:
-#        pdb.set_trace()
-#        data = yaml.safe_load(f.read())
         data = json.loads(f.read())
-#        pdb.set_trace()
-#        data = json.loads(f.read().decode('unicode_escape'))
-#        data = json.loads(f.read().decode('unicode_escape').encode('cp1252').decode('utf-8'))
-#        data = json.loads(f.read())
         data = parsedata(data, coding)
 
     return data, coding
