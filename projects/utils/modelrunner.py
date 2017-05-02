@@ -44,6 +44,7 @@ def run(data=None, functions=None, CONFIG=None):
 				loss += functions['train'](inputs, targets)
 				train_batches += 1
 
+		
 		# And a full pass over the validation data:
 		val_err = 0
 		val_acc = 0
@@ -83,3 +84,4 @@ def run(data=None, functions=None, CONFIG=None):
 			test_acc / test_batches * 100))
 
 	return train_err, valid_err, valid_acc
+

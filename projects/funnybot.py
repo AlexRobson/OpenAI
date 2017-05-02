@@ -54,6 +54,20 @@ def run():
     # TODO: Convert modelrunner into a class
     modelrunner.run(data, functions=FBL.functions, CONFIG=FBL.config)
 
+    # Print some examples
+    seed = 'There was a'
+
+    for i in range(100):
+        encoded_seed = np.array([coding['encoding'][char] for char in seed])
+        N = len(encoded_seed)
+        encoded_seed = encoded_seed.reshape(1, N)
+        encoded_seed, _ = FBL.functions['prepare']((encoded_seed[:, :, None], encoded_seed[None, -1]))
+        encoded_sample = FBL.functions['generate'](encoded_seed.astype('float32'))
+        seed += [coding['decoding'][char] for char in encoded_sample][0]
+
+    print(seed)
+
+
 def create_snippets(sample, sniplength):
     """
     This function receives some sample text of arbitrary length, and then snips it
@@ -83,23 +97,22 @@ def parsedata(data,coding):
 
     X = [(encode_text(d['title']+d['body'], coding), d['score']) for d in data[0:1000]]
     X, y = zip(*X)
-
     if GENERATOR:
-		X_dash = []
-		y_dash = []
-		for x in X:
-			pX, py = create_snippets(x, 20)
-			X_dash.extend(pX)
-			y_dash.extend(py)
+        X_dash = []
+        y_dash = []
+        for x in X:
+            pX, py = create_snippets(x, 20)
+            X_dash.extend(pX)
+            y_dash.extend(py)
 
-		# Now relabel
-		X = X_dash
-		y = y_dash
+        # Now relabel
+        X = X_dash
+        y = y_dash
 
     else:
-		# Normalise the bins
-		_, bins = np.histogram(y)
-		y = np.digitize(y, bins)
+        # Normalise the bins
+        _, bins = np.histogram(y)
+        y = np.digitize(y, bins)
 
 
 

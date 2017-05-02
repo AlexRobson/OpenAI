@@ -6,8 +6,10 @@ def generate_encoding(text):
 
     coding = {}
     chars = list(set(text.decode('unicode_escape')))
-    coding['decoding'] = { i:ch for i,ch in enumerate(chars) }
-    coding['encoding'] = { ch:i for i,ch in enumerate(chars) }
+    chars = [char for char in chars if ord(char) < 128]
+
+    coding['decoding'] = { i:ch for i,ch in enumerate(chars)}
+    coding['encoding'] = { ch:i for i,ch in enumerate(chars)}
 
     return coding
 
