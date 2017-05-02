@@ -45,9 +45,9 @@ def run():
 
     # Initialise the funnybot class
     if GENERATOR:
-        FBL = Scorer()
-    else:
         FBL = Generator()
+    else:
+        FBL = Scorer()
     set_config(FBL)
     FBL.initialise()
 
