@@ -33,7 +33,7 @@ GENERATOR = True
 def set_config(FBL):
 
     config = {}
-    config['num_epochs'] = 5
+    config['num_epochs'] = 10
     config['shuffle'] = False
     config['batch_size'] = 128
 
@@ -79,7 +79,7 @@ def create_snippets(sample, sniplength):
     dataX = []
     datay = []
     if seq_length<sniplength:
-        return sample[0:-1], sample[-1]
+        return [sample[0:-1]], [sample[-1]]
     for i in range(0, seq_length-sniplength, 1):
         seqX = sample[i:i+sniplength]
         seqy = sample[i+sniplength]
@@ -95,7 +95,7 @@ def parsedata(data,coding):
     scorefields = ['score']
     titlefield = ['title']
 
-    X = [(encode_text(d['title']+d['body'], coding), d['score']) for d in data[0:1000]]
+    X = [(encode_text(d['title']+d['body'], coding), d['score']) for d in data[0:10000]]
     X, y = zip(*X)
     if GENERATOR:
         X_dash = []
