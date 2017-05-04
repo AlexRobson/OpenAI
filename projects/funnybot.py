@@ -36,6 +36,8 @@ def set_config(FBL):
     config['num_epochs'] = 10
     config['shuffle'] = False
     config['batch_size'] = 128
+    config['validate'] = False
+    config['test'] = False
 
     setattr(FBL, 'config', config)
 
@@ -49,23 +51,14 @@ def run():
     else:
         FBL = Scorer()
     set_config(FBL)
+    FBL.coding = coding
     FBL.initialise()
 
     # TODO: Convert modelrunner into a class
     modelrunner.run(data, functions=FBL.functions, CONFIG=FBL.config)
 
-    # Print some examples
-    seed = 'There was a'
 
-    for i in range(100):
-        encoded_seed = np.array([coding['encoding'][char] for char in seed])
-        N = len(encoded_seed)
-        encoded_seed = encoded_seed.reshape(1, N)
-        encoded_seed, _ = FBL.functions['prepare']((encoded_seed[:, :, None], encoded_seed[None, -1]))
-        encoded_sample = FBL.functions['generate'](encoded_seed.astype('float32'))
-        seed += [coding['decoding'][char] for char in encoded_sample][0]
 
-    print(seed)
 
 
 def create_snippets(sample, sniplength):
@@ -95,7 +88,7 @@ def parsedata(data,coding):
     scorefields = ['score']
     titlefield = ['title']
 
-    X = [(encode_text(d['title']+d['body'], coding), d['score']) for d in data[0:10000]]
+    X = [(encode_text(d['title']+d['body'], coding), d['score']) for d in data[0:1000]]
     X, y = zip(*X)
     if GENERATOR:
         X_dash = []
