@@ -33,7 +33,7 @@ GENERATOR = True
 def set_config(FBL):
 
     config = {}
-    config['num_epochs'] = 10
+    config['num_epochs'] = 50
     config['shuffle'] = False
     config['batch_size'] = 128
     config['validate'] = False
@@ -57,7 +57,7 @@ def run():
     # TODO: Convert modelrunner into a class
     modelrunner.run(data, functions=FBL.functions, CONFIG=FBL.config)
 
-
+    pdb.set_trace()
 
 
 
@@ -88,7 +88,7 @@ def parsedata(data,coding):
     scorefields = ['score']
     titlefield = ['title']
 
-    X = [(encode_text(d['title']+d['body'], coding), d['score']) for d in data[0:1000]]
+    X = [(encode_text(d['title']+d['body'], coding), d['score']) for d in data[0:100]]
     X, y = zip(*X)
     if GENERATOR:
         X_dash = []
